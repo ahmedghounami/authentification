@@ -7,10 +7,10 @@ export default function Page() {
   async function handelsubmit() {
     // console.log('name:', document.querySelector('#name input').value);
     // console.log('password:', document.querySelector('#password input').value);
-    const response = await fetch("http://localhost:4000", {
+    const response = await fetch("http://localhost:4000/registration", {
       method: "POST",
       body: JSON.stringify({
-        email: document.querySelector("#name input").value,
+        email: document.querySelector("#email input").value,
         password: document.querySelector("#password input").value,
         username: document.querySelector("#username input").value,
         lastname: document.querySelector("#lastname input").value,
@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <div className=" h-screen w-screen flex flex-col items-center justify-center min-h-screen bg-gray-800">
-      <h1 className="text-4xl font-bold mb-4">authentication</h1>
+      <h1 className="text-4xl font-bold mb-4">registration</h1>
       <form
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
         onSubmit={(e) => {
@@ -38,7 +38,7 @@ export default function Page() {
           e.preventDefault();
         }}
       >
-        <label className="block mb-4" id="name">
+        <label className="block mb-4" id="firstname">
           <span className="text-gray-700">firstname</span>
           <input
             type="firstname"
@@ -69,7 +69,7 @@ export default function Page() {
             min={8} // Minimum length of 8 characters
           />
         </label>
-        <label className="block mb-4" id="name">
+        <label className="block mb-4" id="email">
           <span className="text-gray-700">email</span>
           <input
             type="email"
