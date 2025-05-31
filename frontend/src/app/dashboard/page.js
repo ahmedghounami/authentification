@@ -38,21 +38,29 @@ export default function Dashboard() {
     fetchData();
   }, [router]);
 
-  return (
-    <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-800">
-      <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
+  
+  if (!dashboardData) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
+    return (
+      <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-800">
+        <h1 className="text-4xl font-bold mb-4">Dashboard</h1>
         <pre className="text-white">
           {JSON.stringify(dashboardData, null, 2)}
         </pre>
-      <button
-        className="bg-white rounded-full p-2 px-4 text-black mt-4"
-        onClick={() => {
-          Cookies.remove("token");
-          router.push("/login");
-        }}
-      >
-        Log out
-      </button>
-    </div>
-  );
+        <button
+          className="bg-white rounded-full p-2 px-4 text-black mt-4"
+          onClick={() => {
+            Cookies.remove("token");
+            router.push("/login");
+          }}
+        >
+          Log out
+        </button>
+      </div>
+    );
 }
