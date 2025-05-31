@@ -30,6 +30,7 @@ function loginUserHandler(fastify, db) {
       }
 
       // ✅ use fastify.jwt.sign
+      console.log("User authenticated successfully, generating token...");
       const token = fastify.jwt.sign({ id: user.id, email: user.email });
 
       return reply.send({
@@ -45,23 +46,28 @@ function loginUserHandler(fastify, db) {
 
 function dashboardHandler(fastify, db) {
   return async (request, reply) => {
+    console.log("Dashboard handler called --------------------------");
     try {
-      const decoded = await request.jwtVerify(); // still valid here
 
-      const user = await new Promise((resolve, reject) => {
-        db.get("SELECT * FROM users WHERE id = ?", [decoded.id], (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
-        });
-      });
-
+      const user = await getUserByEmailAndPassword(db, request.user.email);
+      
       if (!user) {
         return reply.code(404).send({ error: "User not found" });
       }
 
-      return reply.send({ user });
+      return reply.code(200).send({
+        message: "Welcome to your dashboard!",
+        user: {
+          id: user.id,
+          email: user.email,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          username: user.username,
+        },
+      });
     } catch (err) {
-      return reply.code(401).send({ error: "Invalid token" });
+      console.error("Dashboard error:", err);
+      return reply.code(500).send({ error: "Server error" });
     }
   };
 }

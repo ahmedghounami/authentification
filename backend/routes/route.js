@@ -53,12 +53,15 @@ function userRoutes(fastify, options, done) {
     });
   });
 
-  fastify.post("/dashboard", {
-    preValidation: [fastify.authenticate],
-    handler: dashboardHandler(db),
-  });
+  // fastify.get("/dashboard", {
+  //   preValidation: [fastify.authenticate],
+  //   handler: dashboardHandler(db),
+  // });
 
   done();
 }
 
 module.exports = userRoutes;
+
+
+// DROP TABLE IF EXISTS users;

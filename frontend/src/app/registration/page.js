@@ -20,12 +20,12 @@ export default function Page() {
         "Content-Type": "application/json",
       },
     });
-    // if (response.ok) {
-    //   const data = await response.json();
-    //   console.log('Response:', data);
-    // } else {
-    //   console.error('Error:', response.statusText);
-    // }
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Response:', data);
+    } else {
+      console.error('Error:', response.statusText);
+    }
   }
 
   return (

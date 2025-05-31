@@ -1,62 +1,77 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+
 export default function Page() {
+  const router = useRouter();
+
   const styleinput =
     "text-gray-900 mt-1 block w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500";
-  ("text-gray-900 mt-1 block w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500");
-  async function handelsubmit() {
+
+  async function handelsubmit(e) {
+    e.preventDefault();
+
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
     const response = await fetch("http://localhost:4000/login", {
       method: "POST",
-      body: JSON.stringify({
-        email: document.querySelector("#email input").value,
-        password: document.querySelector("#password input").value,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
+      body: JSON.stringify({ email, password }),
+      headers: { "Content-Type": "application/json" },
     });
+
     if (response.ok) {
       const data = await response.json();
-      console.log("Response:", data);
+      Cookies.set("token", data.token, {
+        expires: 1,
+        secure: true,
+        sameSite: "lax",
+      });
+
+      router.push("/dashboard");
     } else {
-      console.error("Error:", response.statusText);
+      console.error("Login failed:", response.statusText);
     }
   }
 
   return (
-    <div className=" h-screen w-screen flex flex-col items-center justify-center min-h-screen bg-gray-800">
-      <h1 className="text-4xl font-bold mb-4">login</h1>
+    <div className="h-screen w-screen flex flex-col items-center justify-center bg-gray-800">
+      <h1 className="text-4xl font-bold mb-4">Login</h1>
       <form
         className="w-full max-w-sm bg-white p-6 rounded-lg shadow-md"
-        onSubmit={(e) => {
-          handelsubmit();
-          e.preventDefault();
-        }}
+        onSubmit={handelsubmit}
       >
-        <label className="block mb-4" id="email">
-          <span className="text-gray-700">email</span>
+        <label className="block mb-4" htmlFor="email">
+          <span className="text-gray-700">Email</span>
           <input
+            id="email"
+            name="email"
             type="email"
             className={styleinput}
             placeholder="Enter your email"
+            autoComplete="email"
             required
           />
         </label>
-        <label className="block mb-4" id="password">
-          <span className="text-gray-700">password</span>
+        <label className="block mb-4" htmlFor="password">
+          <span className="text-gray-700">Password</span>
           <input
-            type="text"
+            id="password"
+            name="password"
+            type="password"
             className={styleinput}
             placeholder="Enter your password"
+            autoComplete="current-password"
             required
-            min={8} // Minimum length of 8 characters
+            onfocus={(e) => e.target.type = "password"}
           />
         </label>
         <button
           type="submit"
           className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
         >
-          login
+          Login
         </button>
       </form>
     </div>
