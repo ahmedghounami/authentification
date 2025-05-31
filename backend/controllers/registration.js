@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 async function getPasswordHash(password) {
   const saltRounds = 10;
   try {
@@ -13,10 +15,11 @@ async function createuser(db, body) {
   const { email, password, firstname, username, lastname } = body;
   const hashingpassword = await getPasswordHash(password);
   return new Promise((resolve, reject) => {
-    db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
+    db.get("SELECT * FROM users WHERE email = ? OR username = ?", [email, username], (err, row) => {
       if (err) return reject(err);
 
       if (row) {
+        console.log("User already exists");
         return reject(new Error("User already exists"));
       }
       db.run(
@@ -26,7 +29,7 @@ async function createuser(db, body) {
           if (err) {
             reject(err);
           } else {
-            console.log("User created");
+            console.log("User created successfully");
             resolve({ id: this.lastID, email, firstname, username, lastname });
           }
         }
