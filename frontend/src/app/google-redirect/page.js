@@ -18,7 +18,9 @@ export default function GoogleRedirect() {
       });
 
       router.push("/dashboard");
-    } 
+    }
+    else
+      router.push("/");
   }, [router]);
 
   return <div className="text-white">Logging in...</div>;
