@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 
-function getUserByEmailAndPassword(db, email) {
+function getUserByEmail(db, email) {
   return new Promise((resolve, reject) => {
     db.get("SELECT * FROM users WHERE email = ?", [email], (err, row) => {
       if (err) reject(err);
@@ -18,7 +18,7 @@ function loginUserHandler(fastify, db) {
     }
 
     try {
-      const user = await getUserByEmailAndPassword(db, email);
+      const user = await getUserByEmail(db, email);
 
       if (!user) {
         return reply.code(404).send({ error: "User not found" });
@@ -31,7 +31,9 @@ function loginUserHandler(fastify, db) {
 
       // ✅ use fastify.jwt.sign
       console.log("User authenticated successfully, generating token...");
-      const token = fastify.jwt.sign({ id: user.id, email: user.email });
+      const token = fastify.jwt.sign({ id: user.id, email: user.email }, {
+        expiresIn: "1h", // Token expiration time
+      });
 
       return reply.send({
         token,
@@ -49,7 +51,7 @@ function dashboardHandler(fastify, db) {
     console.log("Dashboard handler called --------------------------");
     try {
 
-      const user = await getUserByEmailAndPassword(db, request.user.email);
+      const user = await getUserByEmail(db, request.user.email);
       
       if (!user) {
         return reply.code(404).send({ error: "User not found" });

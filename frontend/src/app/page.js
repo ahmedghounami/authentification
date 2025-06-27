@@ -17,6 +17,12 @@ export default function Page() {
       >
         sign in
       </Link>
+      <Link
+        className="bg-white rounded-full p-2 px-4 text-black"
+        href='/google'
+      >
+        google login
+      </Link>
     </div>
   );
 }

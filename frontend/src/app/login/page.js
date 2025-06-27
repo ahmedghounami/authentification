@@ -31,7 +31,10 @@ export default function Page() {
 
       router.push("/dashboard");
     } else {
-      console.error("Login failed:", response.statusText);
+      console.log("Login failed");
+      const errorData = await response.json();
+      alert(`Login failed: ${errorData.error || "Unknown error"}`);
+      e.target.reset(); // Reset the form fields
     }
   }
 
@@ -64,7 +67,7 @@ export default function Page() {
             placeholder="Enter your password"
             autoComplete="current-password"
             required
-            onfocus={(e) => e.target.type = "password"}
+            onFocus={(e) => e.target.type = "password"}
           />
         </label>
         <button

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Login</title>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <a href="http://localhost:4000/login/google">
+      <button>Login with Google</button>
+    </a>
+    <script>
+      const url = new URL(window.location.href);
+      const token = url.searchParams.get("token");
+      if (token) {
+        localStorage.setItem("token", token);
+        alert("Login successful!");
+      }
+
+      async function fetchDashboard() {
+        const response = await fetch("http://localhost:4000/dashboard", {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        });
+        const data = await response.json();
+        console.log(data);
+      }
+
+      // Uncomment to test dashboard after login
+      // fetchDashboard();
+    </script>
+  </body>
+</html>
