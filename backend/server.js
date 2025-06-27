@@ -1,49 +1,54 @@
 const fastify = require("fastify")();
-const routes = require("./routes/route");
-require("dotenv").config();
+
+fastify.register(require('@fastify/oauth2'), {
+  name: 'googleOAuth2',
+  scope: ['profile', 'email'],
+  credentials: {
+    client: {
+      id: "732616728355-8ougcur6oa8iuc4oe0017d77jg56pem3.apps.googleusercontent.com",
+      secret: "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",
+    },
+    auth: require('@fastify/oauth2').GOOGLE_CONFIGURATION
+  },
+  startRedirectPath: '/login/google',
+  callbackUri: 'http://localhost:4000/login/google/callback'
+});
+
+
+
 const sqlite3 = require("sqlite3").verbose();
 const cors = require("@fastify/cors");
 
-// Register CORS
+// Register plugins
 fastify.register(cors, {
-  origin: "*",
-  methods: "*",
-  allowedHeaders: "*",
+  origin: ["http://localhost:3000"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization, Access-Control-Allow-Origin"],
+  credentials: true,
 });
+// JWT Auth decorator
 
 // SQLite DB setup
 const db = new sqlite3.Database("./users.db", (err) => {
-  if (err) {
-    console.error("Database error:", err.message);
-  } else {
-    db.run(
-      `
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        firstname TEXT NOT NULL,
+  if (err) console.error("Database error:", err.message);
+  else {
+    db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      firstname TEXT NOT NULL,
         lastname TEXT NOT NULL,
         username TEXT NOT NULL,
         email TEXT NOT NULL,
         password TEXT NOT NULL
       )
-      `,
-      (err) => {
-        if (err) {
-          console.error("Error creating users table:", err.message);
-        } else {
-          console.log("Users table created or already exists.");
-        }
-      }
-    );
+      `);
   }
 });
 
-// Register JWT
 fastify.register(require("@fastify/jwt"), {
-  secret: process.env.JWT_SECRET || "supersecret", // Use environment variable or fallback
+  secret: "supersecret",
 });
 
-// JWT Auth decorator
 fastify.decorate("authenticate", async function (request, reply) {
   try {
     console.log("Authenticating user...");
@@ -56,15 +61,15 @@ fastify.decorate("authenticate", async function (request, reply) {
 });
 
 // Register routes
+
 fastify.register(require("./routes/route.js"), { db });
 
-// Dashboard route
 fastify.get(
   "/dashboard",
   { preHandler: [fastify.authenticate] },
   async (request, reply) => {
     const userEmail = request.user.email;
-
+     
     const user = await new Promise((resolve, reject) => {
       db.get(`SELECT * FROM users WHERE email = ?`, [userEmail], (err, row) => {
         if (err) {
@@ -74,6 +79,7 @@ fastify.get(
           resolve(row);
         }
       });
+
     });
 
     if (!user) {
@@ -91,7 +97,6 @@ fastify.get(
   }
 );
 
-// Start the server
 const PORT = 4000;
 fastify.listen({ port: PORT }, (err, address) => {
   if (err) {

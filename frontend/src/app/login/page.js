@@ -1,5 +1,5 @@
 "use client";
-
+const revalidate = 1; // Revalidate every second
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
